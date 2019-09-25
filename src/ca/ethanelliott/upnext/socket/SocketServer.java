@@ -6,11 +6,11 @@ import java.net.Socket;
 import java.util.concurrent.LinkedTransferQueue;
 
 public class SocketServer extends Thread {
-    private LinkedTransferQueue<Integer> messageQueue;
+    private LinkedTransferQueue<Message> messageQueue;
     private int portNumber;
     private ServerSocket serverSocket;
 
-    public SocketServer(int portNumber, LinkedTransferQueue<Integer> messageQueue) {
+    public SocketServer(int portNumber, LinkedTransferQueue<Message> messageQueue) {
         this.portNumber = portNumber;
         this.messageQueue = messageQueue;
         try {
@@ -21,7 +21,6 @@ public class SocketServer extends Thread {
             e.printStackTrace();
         }
     }
-
 
     public void run() {
         while (true) {

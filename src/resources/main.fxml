@@ -94,15 +94,6 @@
             </GridPane>
         </VBox>
         <FlowPane vgap="10" hgap="20" alignment="CENTER" prefWidth="600">
-<!--            <Button id="startButton" text="START" prefWidth="200">-->
-<!--                <style>-->
-<!--                    -fx-background-color: #1db954;-->
-<!--                    -fx-border-color: #1db954;-->
-<!--                    -fx-text-fill: #ffffff;-->
-<!--                    -fx-font-size: 20;-->
-<!--                    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.4) , 5, 0.0 , 0 , 1 );-->
-<!--                </style>-->
-<!--            </Button>-->
             <Button id="stopButton" text="STOP" prefWidth="200">
                 <style>
                     -fx-background-color: #1db954;
