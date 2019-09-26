@@ -10,9 +10,8 @@ public class SocketServer extends Thread {
     private int portNumber;
     private ServerSocket serverSocket;
 
-    public SocketServer(int portNumber, LinkedTransferQueue<Message> messageQueue) {
+    public SocketServer(int portNumber) {
         this.portNumber = portNumber;
-        this.messageQueue = messageQueue;
         try {
             this.serverSocket = new ServerSocket(this.portNumber);
             this.start();
@@ -27,7 +26,7 @@ public class SocketServer extends Thread {
             try {
                 Socket clientConnection = this.serverSocket.accept();
                 System.out.println("NEW CLIENT: " + clientConnection.getRemoteSocketAddress());
-                SocketThread s = new SocketThread(clientConnection, this.messageQueue);
+                SocketThread s = new SocketThread(clientConnection);
             } catch (IOException e) {
                 e.printStackTrace();
             }

@@ -3,7 +3,7 @@ package ca.ethanelliott.upnext.upnext;
 import java.util.ArrayList;
 
 public class PlaylistEntry {
-    private String id;
+    private int id;
     private String name;
     private String artist;
     private String artwork;
@@ -12,15 +12,13 @@ public class PlaylistEntry {
     private ArrayList<User> upvoters;
     private ArrayList<User> downvoters;
 
-    PlaylistEntry() {
+    PlaylistEntry() { }
 
-    }
-
-    public String getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 

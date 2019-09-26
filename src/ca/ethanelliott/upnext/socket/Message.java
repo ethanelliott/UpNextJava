@@ -35,4 +35,16 @@ public class Message {
     public void setData(String eventIdentifier, Object data) {
         this.data = new MessageData(eventIdentifier, data);
     }
+
+    @Override
+    public String toString() {
+        return "\nMessage:\n\tFrom: " +
+                this.destinationAddress +
+                "\n\tTo: " +
+                this.sourceAddress +
+                "\n\tData: \n\t\tEventID: " +
+                this.data.getEventIdentifier() +
+                "\n\t\t Data: " +
+                this.data.getData().toString();
+    }
 }

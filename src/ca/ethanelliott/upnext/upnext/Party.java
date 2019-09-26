@@ -3,6 +3,7 @@ package ca.ethanelliott.upnext.upnext;
 import java.util.ArrayList;
 
 public class Party {
+    private int id;
     private String name;
     private String code;
     private double start;
@@ -155,5 +156,13 @@ public class Party {
 
     public void setHistory(ArrayList<String> history) {
         this.history = history;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 }

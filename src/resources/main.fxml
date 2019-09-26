@@ -5,7 +5,8 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
 <?import java.lang.String?>
-<HBox alignment="CENTER" prefHeight="700" prefWidth="600">
+<HBox alignment="CENTER" prefHeight="700" prefWidth="600"
+      fx:controller="ca.ethanelliott.upnext.controllers.FxFXMLController" xmlns:fx="http://javafx.com/fxml/1">
     <style>
         -fx-background: #303030;
     </style>
@@ -56,7 +57,7 @@
                         -fx-font-size: 20;
                     </style>
                 </Label>
-                <Label text="RUNNING" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                <Label text="-" fx:id="isRunning" GridPane.columnIndex="1" GridPane.rowIndex="0">
                     <style>
                         -fx-font-family: Arial;
                         -fx-font-weight: 100;
@@ -70,7 +71,7 @@
                         -fx-font-size: 20;
                     </style>
                 </Label>
-                <Label text="8888" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                <Label text="-" fx:id="portNumber" GridPane.columnIndex="1" GridPane.rowIndex="1">
                     <style>
                         -fx-font-family: Arial;
                         -fx-font-weight: 100;
@@ -84,7 +85,7 @@
                         -fx-font-size: 20;
                     </style>
                 </Label>
-                <Label text="0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                <Label text="-" fx:id="clientCount" GridPane.columnIndex="1" GridPane.rowIndex="2">
                     <style>
                         -fx-font-family: Arial;
                         -fx-font-weight: 100;
@@ -94,7 +95,7 @@
             </GridPane>
         </VBox>
         <FlowPane vgap="10" hgap="20" alignment="CENTER" prefWidth="600">
-            <Button id="stopButton" text="STOP" prefWidth="200">
+            <Button fx:id="stopButton" text="STOP" onAction="#stopServer" prefWidth="200">
                 <style>
                     -fx-background-color: #1db954;
                     -fx-border-color: #1db954;
