@@ -13,9 +13,6 @@ public class Messenger {
     private Messenger() {
         this.messageQueue = new LinkedTransferQueue<>();
         this.addressLookup = new HashMap<>();
-        new Thread(() -> {
-
-        }).start();
     }
 
     private Map<String, LinkedTransferQueue<Message>> addressLookup;

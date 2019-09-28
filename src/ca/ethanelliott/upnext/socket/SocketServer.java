@@ -3,10 +3,8 @@ package ca.ethanelliott.upnext.socket;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.concurrent.LinkedTransferQueue;
 
 public class SocketServer extends Thread {
-    private LinkedTransferQueue<Message> messageQueue;
     private int portNumber;
     private ServerSocket serverSocket;
 
@@ -26,27 +24,11 @@ public class SocketServer extends Thread {
             try {
                 Socket clientConnection = this.serverSocket.accept();
                 System.out.println("NEW CLIENT: " + clientConnection.getRemoteSocketAddress());
-                SocketThread s = new SocketThread(clientConnection);
+                SocketThread s = new SocketThread(clientConnection, Messenger.getInstance());
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
         }
-    }
-
-    public int getPortNumber() {
-        return portNumber;
-    }
-
-    public void setPortNumber(int portNumber) {
-        this.portNumber = portNumber;
-    }
-
-    public ServerSocket getServerSocket() {
-        return serverSocket;
-    }
-
-    public void setServerSocket(ServerSocket serverSocket) {
-        this.serverSocket = serverSocket;
     }
 }

@@ -1,6 +1,8 @@
 package ca.ethanelliott.upnext.socket;
 
-public class MessageData {
+import java.io.Serializable;
+
+public class MessageData implements Serializable {
     private Object data;
     private String eventIdentifier;
     MessageData(String eventIdentifier, Object data) {

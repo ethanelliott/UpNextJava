@@ -1,18 +1,20 @@
 package ca.ethanelliott.upnext.database;
 
 import javax.xml.crypto.Data;
+import java.io.File;
 import java.sql.*;
 
 public class Database {
     private static Database instance = null;
     public static Database getInstance() {
         if (instance == null) {
+            System.out.println("Created New Database");
             instance = new Database();
         }
         return instance;
     }
 
-    private static String connectionURI = "jdbc:sqlite:" + System.getProperty("user.home") + "\\upnext.db";
+    private static String connectionURI = "jdbc:sqlite:" + System.getProperty("user.home") + File.separator + "upnext.db";
     private Connection connection;
 
     private Database() {

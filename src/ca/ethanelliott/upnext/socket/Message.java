@@ -1,7 +1,8 @@
 package ca.ethanelliott.upnext.socket;
 
-public class Message {
-    // Object used for data as a general placeholder
+import java.io.Serializable;
+
+public class Message implements Serializable {
     private String sourceAddress;
     private String destinationAddress;
     private MessageData data;
