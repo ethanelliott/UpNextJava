@@ -2,8 +2,10 @@ package ca.ethanelliott.upnext.upnext;
 
 import ca.ethanelliott.upnext.database.Database;
 import ca.ethanelliott.upnext.socket.Message;
+import ca.ethanelliott.upnext.spotify.Credentials;
+import ca.ethanelliott.upnext.spotify.CredentialsBuilder;
+import ca.ethanelliott.upnext.spotify.SpotifyApi;
 
-import java.util.Map;
 import java.util.concurrent.LinkedTransferQueue;
 
 public class UpNext extends Thread {
@@ -19,10 +21,19 @@ public class UpNext extends Thread {
 
     private Database database;
     private LinkedTransferQueue<Message> messageQueue;
+    private SpotifyApi spotifyApi;
 
     private UpNext() {
         database = Database.getInstance();
         messageQueue = new LinkedTransferQueue<>();
+        Credentials c = CredentialsBuilder.builder()
+                .setAccessToken("")
+                .setClientID("")
+                .setClientSecret("")
+                .setRedirectURI("")
+                .setRefreshToken("")
+                .build();
+        spotifyApi = new SpotifyApi(c);
         this.start();
     }
 

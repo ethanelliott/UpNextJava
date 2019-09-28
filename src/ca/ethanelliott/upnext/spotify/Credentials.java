@@ -7,12 +7,12 @@ public class Credentials {
     private String refreshToken;
     private String redirectURI;
 
-    public Credentials() {
-        this.clientID = "";
-        this.clientSecret = "";
-        this.accessToken = "";
-        this.refreshToken = "";
-        this.redirectURI = "";
+    public Credentials(String clientID, String clientSecret, String accessToken, String refreshToken, String redirectURI) {
+        this.clientID = clientID;
+        this.clientSecret = clientSecret;
+        this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
+        this.redirectURI = redirectURI;
     }
 
     public String getClientID() {

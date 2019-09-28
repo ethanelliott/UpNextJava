@@ -14,7 +14,7 @@ public class SpotifyApi {
     public SearchAPI search;
     public TracksAPI tracks;
 
-    SpotifyApi(Credentials credentials) {
+    public SpotifyApi(Credentials credentials) {
         this.credentials = credentials;
         this.albums = new AlbumsAPI(this.credentials);
         this.artists = new ArtistsAPI(this.credentials);
