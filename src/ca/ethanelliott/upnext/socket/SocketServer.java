@@ -5,6 +5,15 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class SocketServer extends Thread {
+    private static SocketServer instance = null;
+    public static SocketServer getInstance(int portNumber) {
+        if (instance == null) {
+            System.out.println("Creating new Socket Server");
+            instance = new SocketServer(portNumber);
+        }
+        return instance;
+    }
+
     private int portNumber;
     private ServerSocket serverSocket;
 
@@ -30,5 +39,9 @@ public class SocketServer extends Thread {
             }
 
         }
+    }
+
+    public int getPortNumber() {
+        return portNumber;
     }
 }

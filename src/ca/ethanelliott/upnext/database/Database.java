@@ -1,11 +1,17 @@
 package ca.ethanelliott.upnext.database;
 
-import javax.xml.crypto.Data;
+import ca.ethanelliott.upnext.upnext.Party;
+
 import java.io.File;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
 
 public class Database {
     private static Database instance = null;
+
     public static Database getInstance() {
         if (instance == null) {
             System.out.println("Created New Database");
@@ -37,11 +43,17 @@ public class Database {
     private void setupTables() {
         try {
             Statement s = connection.createStatement();
-            for (String stmt : TableCreateStatements.statements) {
-                s.execute(stmt);
-            }
+            s.execute(String.valueOf(TableCreateStatements.statements.get("create")));
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public void storeState(ArrayList<Party> parties) {
+
+    }
+
+    public ArrayList<Party> loadState() {
+        return null;
     }
 }

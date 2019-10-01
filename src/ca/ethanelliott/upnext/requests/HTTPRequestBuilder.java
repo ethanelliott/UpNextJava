@@ -5,6 +5,7 @@ import java.net.URL;
 import java.util.ArrayList;
 
 public class HTTPRequestBuilder {
+    //
     URL url;
     String host;
     String scheme;
@@ -14,7 +15,9 @@ public class HTTPRequestBuilder {
     String path;
     HTTP_METHODS method;
 
-    private HTTPRequestBuilder() { }
+    private HTTPRequestBuilder() {
+    }
+
     static public HTTPRequestBuilder make() {
         return new HTTPRequestBuilder();
     }

@@ -6,10 +6,15 @@ import java.util.concurrent.LinkedTransferQueue;
 
 public class Messenger {
     private static Messenger instance = null;
+
     public static Messenger getInstance() {
-        if (instance == null) { instance = new Messenger(); }
+        if (instance == null) {
+            System.out.println("Created New Messenger");
+            instance = new Messenger();
+        }
         return instance;
     }
+
     private Messenger() {
         this.messageQueue = new LinkedTransferQueue<>();
         this.addressLookup = new HashMap<>();
@@ -31,10 +36,12 @@ public class Messenger {
         return this.addressLookup;
     }
 
-    public boolean addNewAddress(String address) {
-        LinkedTransferQueue<Message> localRef = new LinkedTransferQueue<>();
-        if (this.addressLookup.containsKey(address)) { return false; }
-        this.addressLookup.put(address, localRef);
+    public boolean registerNewAddress(String address) {
+        // On new address, create an entry in the lookup with the associated LTQ
+        if (this.addressLookup.containsKey(address)) {
+            return false;
+        }
+        this.addressLookup.put(address, new LinkedTransferQueue<>());
         return true;
     }
 

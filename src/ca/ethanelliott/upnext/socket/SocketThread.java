@@ -5,27 +5,25 @@ package ca.ethanelliott.upnext.socket;
  * It has its own message queue that it can pull from, and serialize to be sent over the
  * socket connection. This means that the messenger just knows where to send the message as a
  * transient object, but this class does the heavy lifting, all on separate threads :)
- *
+ * <p>
  * It has the message queue, an identifier, a read/write for the socket, and a reference
  * to the messenger
- *
+ * <p>
  * and 2 threads
  * - one for reading from the socket
- *      - reads the message, de-serialize, push to the messenger queue
+ * - reads the message, de-serialize, push to the messenger queue
  * - one for writing to the socket
- *      - reads from the message queue, serialize, write to the socket
- *
+ * - reads from the message queue, serialize, write to the socket
+ * <p>
  * messenger posts the directed message to the queue, the thread loop checks for
  * a message and then serializes and
- *
  */
 
-import java.io.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.Date;
-import java.util.Random;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 
 public class SocketThread extends Thread {
@@ -34,12 +32,15 @@ public class SocketThread extends Thread {
     private Socket client;
     private ObjectOutputStream out;
     private ObjectInputStream in;
+    private Thread consumer;
+    private Thread producer;
 
     SocketThread(Socket clientSocket, Messenger messenger) {
         this.client = clientSocket;
         this.messenger = messenger;
         uuid = UUID.randomUUID().toString();
-        Messenger.getInstance().addNewAddress(uuid);
+        Messenger.getInstance().registerNewAddress(uuid);
+        System.out.println("Creating new Socket Thread @ " + uuid);
         try {
             this.out = new ObjectOutputStream(this.client.getOutputStream());
             this.in = new ObjectInputStream(this.client.getInputStream());
@@ -53,45 +54,57 @@ public class SocketThread extends Thread {
         System.out.println("New Socket Thread");
 
         // Start consumer thread
-        new Thread(() -> {
-            while (true) {
-                try {
-                    Message input = (Message) this.in.readObject();
-                    messenger.postMessage(input);
-                } catch (IOException | ClassNotFoundException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
-
-        // This is the producer thread
-        System.out.println("STARTING PRODUCER");
-        Random random = new Random(new Date().getTime());
-        while (true) {
+        this.consumer = new Thread(() -> {
             try {
-                Message m = new Message(uuid, "*", "event-id", random.nextInt(100));
-                this.out.writeObject(m);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+                System.out.println("Starting Consumer");
+                while (true) {
+                    try {
+                        Message input = (Message) this.in.readObject();
+                        messenger.postMessage(input);
+                    } catch (IOException | ClassNotFoundException e) {
+                        e.printStackTrace();
+                    }
 
-//        try {
-//
-//            try {
-//                Thread.sleep(TimeUnit.SECONDS.toMillis(1));
-//                Integer messageData = random.nextInt();
-//
-//                Messenger.getInstance().postToQueueByAddress(uuid, m);
-//                System.out.println("Producer added the message - " + messageData);
-//                Thread.sleep(TimeUnit.SECONDS.toMillis(1));
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//            this.client.close();
-//        } catch (IOException e) {
-//            System.out.println("Exception caught...");
-//            System.out.println(e.getMessage());
-//        }
+                }
+            } catch (Exception e) {
+                System.out.println("UNHANDLED ERROR IN CONSUMER");
+                try {
+                    this.client.close();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+                this.terminate();
+            }
+        });
+
+        this.producer = new Thread(() -> {
+            // This is the producer thread
+            System.out.println("Starting Producer");
+            try {
+                while (true) {
+                    try {
+                        if (this.messenger.getQueueByAddress(this.uuid).size() > 0) {
+                            Message message = this.messenger.getQueueByAddress(this.uuid).take();
+                            this.out.writeObject(message);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            } catch (Exception e) {
+                System.out.println("UNHANDLED ERROR IN PRODUCER");
+            }
+        });
+
+
+        this.consumer.start();
+        this.producer.start();
+    }
+
+    private void terminate() {
+        System.out.println("TERMINATE THREAD");
+        this.producer.stop();
+        this.consumer.stop();
+        this.stop();
     }
 }

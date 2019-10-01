@@ -1,6 +1,7 @@
 package ca.ethanelliott.upnext;
 
 import ca.ethanelliott.upnext.socket.Message;
+import ca.ethanelliott.upnext.socket.Messenger;
 import ca.ethanelliott.upnext.socket.SocketServer;
 import ca.ethanelliott.upnext.upnext.UpNext;
 //import javafx.application.Application;
@@ -20,7 +21,12 @@ public class UpNextMain /*extends Application*/ implements Runnable {
     public void run() {
         //Start the interface
         //launch(args);
+        Messenger.getInstance();
+        UpNext.getInstance();
+        SocketServer.getInstance(SOCKET_SERVER_PORT);
 
+
+        System.out.println("UPNEXT SERVER RUNNING");
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             System.out.println("Shutting Down");
             try {
@@ -30,22 +36,6 @@ public class UpNextMain /*extends Application*/ implements Runnable {
             }
             System.out.println("UpNext Server Stopped");
         }));
-
-        System.out.println("UPNEXT SERVER RUNNING");
-
-        UpNext upNext = UpNext.getInstance();
-
-        SocketServer socketServer = new SocketServer(SOCKET_SERVER_PORT);
-
-        while(true) {
-            upNext.postMessageToQueue(new Message("0", "1", "eventName", 45));
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-
     }
 
 //    @Override

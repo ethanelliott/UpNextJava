@@ -40,7 +40,7 @@ public class UpNext extends Thread {
     @Override
     public void run() {
         while (true) {
-            System.out.println("LOOP" + this.messageQueue.size());
+//            System.out.println("LOOP" + this.messageQueue.size());
             Message m = null;
             try {
                 if (this.messageQueue.size() != 0) {
