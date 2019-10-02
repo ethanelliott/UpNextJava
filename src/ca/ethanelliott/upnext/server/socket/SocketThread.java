@@ -63,7 +63,6 @@ public class SocketThread extends Thread {
                         Message input = (Message) this.in.readObject();
                         messenger.postMessage(input);
                     } catch (IOException | ClassNotFoundException e) {
-                        e.printStackTrace();
                         this.terminate();
                     }
 
@@ -104,7 +103,7 @@ public class SocketThread extends Thread {
     }
 
     private void terminate() {
-        System.out.println("TERMINATE THREAD");
+        System.out.println("SOCKET DISCONNECT - TERMINATE THREAD");
         this.producer.interrupt();
         this.consumer.interrupt();
         this.interrupt();
