@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<HBox styleClass="container" alignment="CENTER" prefHeight="800" prefWidth="1000"
+      fx:controller="ca.ethanelliott.upnext.client.controllers.mainController"
+      xmlns:fx="http://javafx.com/fxml/1">
+    <VBox alignment="CENTER" spacing="40">
+
+    </VBox>
+</HBox>

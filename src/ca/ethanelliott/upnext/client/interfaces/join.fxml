@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<HBox styleClass="container" alignment="CENTER" prefHeight="800" prefWidth="1000"
+      fx:controller="ca.ethanelliott.upnext.client.controllers.joinController" xmlns:fx="http://javafx.com/fxml/1">
+    <VBox alignment="CENTER" spacing="40">
+        <ImageView fitWidth="50" preserveRatio="true">
+            <Image url="@../../resources/music_note.png"/>
+        </ImageView>
+        <HBox alignment="CENTER">
+            <Label text="UP">
+                <style>
+                    -fx-font-family: Arial;
+                    -fx-font-weight: bold;
+                    -fx-font-size: 48;
+                </style>
+            </Label>
+            <Label text="NEXT">
+                <style>
+                    -fx-font-family: Arial;
+                    -fx-font-weight: 100;
+                    -fx-font-style: italic;
+                    -fx-font-size: 48;
+                </style>
+            </Label>
+        </HBox>
+        <HBox alignment="CENTER">
+            <Label text="Join the Party!">
+                <style>
+                    -fx-font-family: Arial;
+                    -fx-font-size: 22;
+                </style>
+            </Label>
+        </HBox>
+        <VBox alignment="CENTER" prefWidth="400" spacing="40">
+            <VBox spacing="5">
+                <HBox>
+                    <Label text="Party Code">
+                        <style>
+                            -fx-font-family: Arial;
+                            -fx-font-style: italic;
+                        </style>
+                    </Label>
+                </HBox>
+                <TextField styleClass="input" fx:id="partyCode" onKeyReleased="#checkInput" promptText="Party Code"/>
+            </VBox>
+            <VBox spacing="5">
+                <HBox>
+                    <Label text="Nick Name">
+                        <style>
+                            -fx-font-family: Arial;
+                            -fx-font-style: italic;
+                        </style>
+                    </Label>
+                </HBox>
+                <TextField styleClass="input" fx:id="userName" onKeyReleased="#checkInput" promptText="Nick Name"/>
+            </VBox>
+            <Button styleClass="button-full" fx:id="joinButton" onAction="#joinParty" text="JOIN" prefWidth="600"/>
+        </VBox>
+    </VBox>
+</HBox>
