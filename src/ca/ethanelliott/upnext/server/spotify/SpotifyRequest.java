@@ -28,13 +28,18 @@ public class SpotifyRequest {
         this.bodyParameters = builder.bodyParameters;
     }
 
-    public HashMap<String, Object> execute() throws IOException {
-        return HTTPRequest.makeRequest(this.method, this.getURI(), this.headers, this.queryParameters, this.bodyParameters);
+    public HashMap<String, Object> execute() {
+        try {
+            return HTTPRequest.makeRequest(this.method, this.getURI(), this.headers, this.queryParameters, this.bodyParameters);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     private URL getURI() {
         try {
-            return new URL(String.format("%s://%s", this.scheme, this.host));
+            return new URL(String.format("%s://%s%s", this.scheme, this.host, this.path));
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }

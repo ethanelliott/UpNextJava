@@ -14,7 +14,6 @@ public class Party implements Serializable {
     private String refreshToken;
     private double tokenExpiry;
     private String userID;
-    private String playlistID;
     private ArrayList<PlaylistEntry> playlist;
     private String currentTrack;
     private boolean playState;
@@ -100,14 +99,6 @@ public class Party implements Serializable {
 
     public void setUserID(String userID) {
         this.userID = userID;
-    }
-
-    public String getPlaylistID() {
-        return playlistID;
-    }
-
-    public void setPlaylistID(String playlistID) {
-        this.playlistID = playlistID;
     }
 
     public ArrayList<PlaylistEntry> getPlaylist() {

@@ -2,6 +2,7 @@ package ca.ethanelliott.upnext.server.spotify;
 
 import ca.ethanelliott.upnext.server.requests.HTTP_METHODS;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class SpotifyRequestBuilder {
@@ -18,6 +19,9 @@ public class SpotifyRequestBuilder {
     }
 
     private SpotifyRequestBuilder() {
+        this.headers = new HashMap<>();
+        this.queryParameters = new HashMap<>();
+        this.bodyParameters = new HashMap<>();
     }
 
     public SpotifyRequestBuilder withMethod(HTTP_METHODS method) {

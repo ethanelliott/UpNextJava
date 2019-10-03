@@ -5,15 +5,15 @@ import ca.ethanelliott.upnext.server.spotify.WebApiRequestBuilder;
 
 import java.util.Map;
 
-public class TracksAPI {
-    public TracksAPI() {
+public class UsersAPI {
+    public UsersAPI() {
     }
 
-    public Map<String, Object> getTrack(String accessToken, String trackID) {
+    public Map<String, Object> getCurrentUsersProfile(String accessToken) {
         return WebApiRequestBuilder
                 .make(accessToken)
                 .withMethod(HTTP_METHODS.GET)
-                .withPath(String.format("/v1/tracks/%s", trackID))
+                .withPath("/v1/me")
                 .build()
                 .execute();
     }

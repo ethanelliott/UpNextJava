@@ -87,7 +87,6 @@ public class HTTPRequest {
                     resJSON.append(rlString);
                 }
                 Gson g = new Gson();
-                httpClient.close();
                 return (HashMap<String, Object>) g.fromJson(resJSON.toString(), HashMap.class);
             }
         }

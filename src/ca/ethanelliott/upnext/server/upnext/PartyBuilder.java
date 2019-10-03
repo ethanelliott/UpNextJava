@@ -16,7 +16,7 @@ public class PartyBuilder {
         return code.toString();
     }
 
-    public static Party build(String name, String adminPassword, String token, String refreshToken, double tokenExpiry, String userID, String playlistID) {
+    public static Party build(String name, String adminPassword, String token, String refreshToken, double tokenExpiry, String userID) {
         Party party = new Party();
         party.setUuid(UUID.randomUUID().toString());
         party.setName(name);
@@ -29,7 +29,6 @@ public class PartyBuilder {
         party.setRefreshToken(refreshToken);
         party.setTokenExpiry(tokenExpiry);
         party.setUserID(userID);
-        party.setPlaylistID(playlistID);
         party.setPlaylist(new ArrayList<>());
         party.setCurrentTrack(null);
         party.setPlayState(false);

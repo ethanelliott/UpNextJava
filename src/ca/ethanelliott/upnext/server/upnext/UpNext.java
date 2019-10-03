@@ -3,13 +3,9 @@ package ca.ethanelliott.upnext.server.upnext;
 import ca.ethanelliott.upnext.server.database.Database;
 import ca.ethanelliott.upnext.server.socket.Message;
 import ca.ethanelliott.upnext.server.socket.Messenger;
-import ca.ethanelliott.upnext.server.spotify.Credentials;
-import ca.ethanelliott.upnext.server.spotify.CredentialsBuilder;
 import ca.ethanelliott.upnext.server.spotify.SpotifyApi;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class UpNext extends Thread {
@@ -31,14 +27,7 @@ public class UpNext extends Thread {
     private UpNext() {
         database = Database.getInstance();
         messenger = Messenger.getInstance();
-        Credentials credentials = CredentialsBuilder.builder()
-                .setAccessToken("")
-                .setClientID("")
-                .setClientSecret("")
-                .setRedirectURI("")
-                .setRefreshToken("")
-                .build();
-        spotifyApi = new SpotifyApi(credentials);
+        spotifyApi = new SpotifyApi();
         this.start();
     }
 
@@ -78,14 +67,14 @@ public class UpNext extends Thread {
     private void createParty(Message message) {
         System.out.println("NEW PARTY CREATED!");
         Map<String, Object> data = (Map<String, Object>) message.getData().getData();
+        Map<String, Object> userData = spotifyApi.users.getCurrentUsersProfile((String) ((Map<String, Object>) data.get("tokens")).get("access_token"));
         Party party = PartyBuilder.build(
                 (String) data.get("name"),
                 (String) data.get("password"),
                 (String) ((Map<String, Object>) data.get("tokens")).get("access_token"),
                 (String) ((Map<String, Object>) data.get("tokens")).get("refresh_token"),
                 (double) ((Map<String, Object>) data.get("tokens")).get("expires_in"),
-                "",
-                ""
+                (String) userData.get("id")
         );
         this.partyMap.put(party.getUuid(), party);
         this.messenger.postToQueueByAddress(message.getSourceAddress(), new Message("*", message.getSourceAddress(), "party-created", party));
