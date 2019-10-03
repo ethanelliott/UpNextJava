@@ -28,7 +28,7 @@ public class HTTPRequest {
                 queryString.append(String.format("%s=%s&", queryParam.getKey(), queryParam.getValue()));
             }
             String newUrl = queryString.toString();
-            if (newUrl.charAt(newUrl.length()-1) == '&') {
+            if (newUrl.charAt(newUrl.length() - 1) == '&') {
                 newUrl = newUrl.substring(0, newUrl.length() - 1);
             }
             url = new URL(newUrl);
