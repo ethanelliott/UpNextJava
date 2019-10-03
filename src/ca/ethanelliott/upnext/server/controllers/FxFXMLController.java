@@ -1,14 +1,17 @@
 package ca.ethanelliott.upnext.server.controllers;
 
-import ca.ethanelliott.upnext.server.UpNextServer;
+import ca.ethanelliott.upnext.server.socket.SocketServer;
+import javafx.beans.property.Property;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 
 import java.net.URL;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class FxFXMLController {
-
 
     @FXML
     public Label clientCount;
@@ -25,14 +28,17 @@ public class FxFXMLController {
     @FXML
     private URL location;
 
-    public FxFXMLController() {}
+    public FxFXMLController() {
+    }
 
     @FXML
     private void initialize() {
-
+        SocketServer socketServer = SocketServer.getInstance(0);
         this.isRunning.setText("RUNNING");
-        this.portNumber.setText(String.valueOf(UpNextServer.SOCKET_SERVER_PORT));
+        this.portNumber.textProperty().bind(new SimpleIntegerProperty(socketServer.getPortNumber()).asString());
+        this.clientCount.textProperty().bind(new SimpleIntegerProperty(socketServer.clientCount).asString());
     }
+
 
     @FXML
     private void stopServer() {

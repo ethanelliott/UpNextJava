@@ -1,6 +1,8 @@
 package ca.ethanelliott.upnext.server.upnext;
 
-public class PlaylistAdded {
+import java.io.Serializable;
+
+public class PlaylistAdded implements Serializable {
     private String uuid;
     private String name;
     private double time;

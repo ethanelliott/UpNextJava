@@ -52,37 +52,45 @@ public class spotifyAuthController implements Initializable {
                     "redirect_uri", "http://localhost:1337/party/auth-callback",
                     "state", UUID.randomUUID()
             );
-            if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
-                try {
-                    Desktop.getDesktop().browse(new URI(url));
-                    ServerSocket serverSocket = new ServerSocket(1337);
-                    Socket clientSocket = serverSocket.accept();
-                    BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                    Map<String, String> urlParameters = Arrays.stream(
-                            in.readLine().split(" ")[1].split("/party/auth-callback\\?")[1].split("&")
-                    )
-                            .map(e -> e.split("="))
-                            .collect(Collectors.toMap(e -> e[0], e -> e[1])
-                            );
-                    PrintWriter out = new PrintWriter(clientSocket.getOutputStream());
-                    String response = "<h1>YOU CAN CLOSE THIS TAB NOW :)</h1>";
-                    out.println("HTTP/1.1 200 OK");
-                    out.println("Content-Type: text/html");
-                    out.println("Content-Length: " + response.length());
-                    out.println();
-                    out.println(response);
-                    out.flush();
-                    out.close();
-                    clientSocket.close();
-                    return urlParameters;
-                } catch (IOException | URISyntaxException e) {
-                    e.printStackTrace();
-                }
-            }
+            Map<String, String> urlParameters = getURLParams(url);
+            if (urlParameters != null) return urlParameters;
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private Map<String, String> getURLParams(String url) {
+        if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+            try {
+                Desktop.getDesktop().browse(new URI(url));
+                ServerSocket serverSocket = new ServerSocket(1337);
+                Socket clientSocket = serverSocket.accept();
+                BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                Map<String, String> urlParameters = Arrays
+                        .stream(in.readLine().split(" ")[1].split("/party/auth-callback\\?")[1].split("&"))
+                        .map(e -> e.split("="))
+                        .collect(Collectors.toMap(e -> e[0], e -> e[1]));
+                printDonePage(clientSocket);
+                clientSocket.close();
+                return urlParameters;
+            } catch (IOException | URISyntaxException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+    private void printDonePage(Socket clientSocket) throws IOException {
+        PrintWriter out = new PrintWriter(clientSocket.getOutputStream());
+        String response = "<h1>YOU CAN CLOSE THIS TAB NOW :)</h1>";
+        out.println("HTTP/1.1 200 OK");
+        out.println("Content-Type: text/html");
+        out.println("Content-Length: " + response.length());
+        out.println();
+        out.println(response);
+        out.flush();
+        out.close();
     }
 
 
@@ -92,12 +100,15 @@ public class spotifyAuthController implements Initializable {
 
         CloseableHttpClient httpClient = HttpClients.createDefault();
         HttpPost httpPost = new HttpPost(url.toString());
-        List<NameValuePair> params = new ArrayList<NameValuePair>();
+        List<NameValuePair> params = new ArrayList<>();
         params.add(new BasicNameValuePair("grant_type", "authorization_code"));
         params.add(new BasicNameValuePair("code", code));
         params.add(new BasicNameValuePair("redirect_uri", "http://localhost:1337/party/auth-callback"));
         httpPost.setEntity(new UrlEncodedFormEntity(params));
 
+        /*
+        THIS IS IMPORTANT
+         */
         String authString = Base64.getEncoder().encodeToString(String.format("%s:%s", SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET).getBytes());
         httpPost.addHeader("Authorization", String.format("Basic %s", authString));
 
@@ -107,9 +118,7 @@ public class spotifyAuthController implements Initializable {
                 // do something useful
                 String data = "";
                 StringBuilder res = new StringBuilder();
-                while ((data = br.readLine()) != null) {
-                    res.append(data);
-                }
+                while ((data = br.readLine()) != null) { res.append(data); }
                 Gson g = new Gson();
                 return g.fromJson(res.toString(), HashMap.class);
             }
@@ -150,7 +159,6 @@ public class spotifyAuthController implements Initializable {
                 }
             }
         }
-        UpNext.getInstance().startEventLoop();
         Parent view = null;
         try {
             view = FXMLLoader.load(Objects.requireNonNull

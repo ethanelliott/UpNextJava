@@ -104,6 +104,7 @@ public class SocketThread extends Thread {
 
     private void terminate() {
         System.out.println("SOCKET DISCONNECT - TERMINATE THREAD");
+        SocketServer.getInstance(0).clientCount--;
         this.producer.interrupt();
         this.consumer.interrupt();
         this.interrupt();

@@ -16,6 +16,7 @@ public class SocketServer extends Thread {
 
     private int portNumber;
     private ServerSocket serverSocket;
+    public int clientCount;
 
     public SocketServer(int portNumber) {
         this.portNumber = portNumber;
@@ -32,6 +33,7 @@ public class SocketServer extends Thread {
         while (true) {
             try {
                 Socket clientConnection = this.serverSocket.accept();
+                this.clientCount++;
                 System.out.println("NEW CLIENT: " + clientConnection.getRemoteSocketAddress());
                 SocketThread s = new SocketThread(clientConnection, Messenger.getInstance());
             } catch (IOException e) {
@@ -43,5 +45,9 @@ public class SocketServer extends Thread {
 
     public int getPortNumber() {
         return portNumber;
+    }
+
+    public int getClientCount() {
+        return clientCount;
     }
 }

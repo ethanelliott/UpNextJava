@@ -7,9 +7,10 @@ import ca.ethanelliott.upnext.server.spotify.Credentials;
 import ca.ethanelliott.upnext.server.spotify.CredentialsBuilder;
 import ca.ethanelliott.upnext.server.spotify.SpotifyApi;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.concurrent.LinkedTransferQueue;
 
 public class UpNext extends Thread {
     private static UpNext instance = null;
@@ -25,31 +26,30 @@ public class UpNext extends Thread {
     private Database database;
     private Messenger messenger;
     private SpotifyApi spotifyApi;
+    private Map<String, Party> partyMap = new HashMap<>();
 
     private UpNext() {
         database = Database.getInstance();
         messenger = Messenger.getInstance();
-        Credentials c = CredentialsBuilder.builder()
+        Credentials credentials = CredentialsBuilder.builder()
                 .setAccessToken("")
                 .setClientID("")
                 .setClientSecret("")
                 .setRedirectURI("")
                 .setRefreshToken("")
                 .build();
-        spotifyApi = new SpotifyApi(c);
+        spotifyApi = new SpotifyApi(credentials);
         this.start();
     }
 
     private void processMessage(Message message) {
         switch (message.getData().getEventIdentifier()) {
             case "create-party":
-                System.out.println("NEW PARTY CREATED!");
-                Map<String, Object> data = new HashMap<>();
-                data.put("code", "BATH");
-                this.messenger.postToQueueByAddress(message.getSourceAddress(), new Message("*", message.getSourceAddress(), "party-created", data));
+                this.createParty(message);
                 break;
             case "event-loop":
                 // PLEASE DO NOTHING
+                this.eventLoop(message);
                 break;
             default:
                 throw new IllegalStateException("Unexpected value: " + message.getData().getEventIdentifier());
@@ -73,5 +73,26 @@ public class UpNext extends Thread {
 
     public Database getDatabase() {
         return database;
+    }
+
+    private void createParty(Message message) {
+        System.out.println("NEW PARTY CREATED!");
+        Map<String, Object> data = (Map<String, Object>) message.getData().getData();
+        Party party = PartyBuilder.build(
+                (String) data.get("name"),
+                (String) data.get("password"),
+                (String) ((Map<String, Object>) data.get("tokens")).get("access_token"),
+                (String) ((Map<String, Object>) data.get("tokens")).get("refresh_token"),
+                (double) ((Map<String, Object>) data.get("tokens")).get("expires_in"),
+                "",
+                ""
+        );
+        this.partyMap.put(party.getUuid(), party);
+        this.messenger.postToQueueByAddress(message.getSourceAddress(), new Message("*", message.getSourceAddress(), "party-created", party));
+    }
+
+    private void eventLoop(Message message) {
+        Party party = this.partyMap.get((String) message.getData().getData());
+        this.messenger.postToQueueByAddress(message.getSourceAddress(), new Message("*", message.getSourceAddress(), "event-loop-response", party));
     }
 }

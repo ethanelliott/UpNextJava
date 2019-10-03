@@ -1,6 +1,8 @@
 package ca.ethanelliott.upnext.server.upnext;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable {
     private int id;
     private String nickName;
     private int score;

@@ -1,8 +1,9 @@
 package ca.ethanelliott.upnext.server.upnext;
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Party {
-    private int id;
+public class Party implements Serializable {
+    private String uuid;
     private String name;
     private String code;
     private double start;
@@ -157,11 +158,11 @@ public class Party {
         this.history = history;
     }
 
-    public int getId() {
-        return id;
+    public String getUuid() {
+        return uuid;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 }

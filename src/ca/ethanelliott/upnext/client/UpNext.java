@@ -1,6 +1,7 @@
 package ca.ethanelliott.upnext.client;
 
 import ca.ethanelliott.upnext.server.socket.Message;
+import ca.ethanelliott.upnext.server.upnext.Party;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -23,6 +24,8 @@ public class UpNext implements Runnable{
     private Thread producer;
 
     private String address;
+
+    private String partyID;
 
     public Object interSceneObject;
 
@@ -57,11 +60,11 @@ public class UpNext implements Runnable{
                 while (true) {
                     try {
                         Message input = (Message) this.in.readObject();
-                        System.out.println(input);
+                        this.processEvents(input);
                     } catch (IOException | ClassNotFoundException e) {
-                        e.printStackTrace();
+                        System.out.println("LOOKS LIKE THE SERVER IS NOT RUNNING");
+                        System.exit(0);
                     }
-
                 }
             } catch (Exception e) {
                 System.out.println("UNHANDLED ERROR IN CONSUMER");
@@ -76,13 +79,29 @@ public class UpNext implements Runnable{
         this.consumer.start();
     }
 
+    private void processEvents(Message message) {
+        switch(message.getData().getEventIdentifier()) {
+            case "party-created":
+                Party party = (Party) message.getData().getData();
+                System.out.println(party.getName() + " | " + party.getCode() + " | " + party.getUuid());
+                this.partyID = party.getUuid();
+                UpNext.getInstance().startEventLoop();
+                break;
+            case "event-loop-response":
+                this.eventLoopResponse(message);
+                break;
+            default:
+                System.out.println("Unknown event identifier :(");
+                break;
+        }
+    }
+
     public void sendMessage(String eventIdentifier, Object data) throws IOException {
         this.out.writeObject(new Message(this.address, "*", eventIdentifier, data));
     }
 
     public void startEventLoop() {
         if (this.producer == null) {
-            // Producer thread is responsible for the main event loop
             this.producer = new Thread(() -> {
                 // This is the producer thread
                 System.out.println("Starting EVENT LOOP");
@@ -90,7 +109,7 @@ public class UpNext implements Runnable{
                     while (true) {
                         Thread.sleep(100);
                         try {
-                            Message m = new Message("0", "1", "event-loop", true);
+                            Message m = new Message(this.address, "*", "event-loop", this.partyID);
                             this.out.writeObject(m);
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -104,5 +123,10 @@ public class UpNext implements Runnable{
         } else {
             System.out.println("EVENT LOOP ALREADY RUNNING");
         }
+    }
+
+    private void eventLoopResponse(Message message) {
+        Party party = (Party) message.getData().getData();
+
     }
 }
