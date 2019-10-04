@@ -2,6 +2,10 @@
     -fx-background: #303030;
 }
 
+.mainBackground {
+    -fx-background-color: linear-gradient(to bottom, #857f84, #000000);
+}
+
 .button-full {
     -fx-background-color: #1db954;
     -fx-border-color: #1db954;
@@ -34,6 +38,19 @@
     -fx-cursor: hand;
 }
 
+.button-flat {
+    -fx-background-color: #303030;
+    -fx-text-fill: #1db954;
+    -fx-font-size: 16;
+}
+
+.button-flat:hover {
+    -fx-background-color: rgba(135, 255, 156, 0.18);
+    -fx-text-fill: #1db954;
+    -fx-font-size: 16;
+    -fx-cursor: hand;
+}
+
 .input {
     -fx-background-color: #1db954, -fx-background;
     -fx-font-size:18px;
@@ -45,4 +62,67 @@
 
 .input:focused {
     -fx-background-color: #1db954, -fx-background ;
+}
+
+.header-container {
+    -fx-background-color: #212121;
+    -fx-border-color: #212121;
+    -fx-padding: 0px 20px 0px 20px;
+    -fx-effect: dropshadow( three-pass-box, rgba(0,0,0,0.6), 10, 0.0, 0, 1);
+}
+
+.footer-container {
+    -fx-background-color: #212121;
+    -fx-border-color: #212121;
+    -fx-text-fill: #ffffff;
+    /*-fx-padding: 0px 20px 0px 20px;*/
+    -fx-effect: dropshadow( three-pass-box, rgba(0,0,0,0.6) , 10, 0.0, 0 , 1);
+}
+
+.main-container {
+
+}
+
+.pad-me {
+    -fx-padding: 0px 15px 0px 15px;
+}
+
+.albumArtworkContainer {
+    -fx-effect: dropshadow( three-pass-box, rgba(0,0,0,0.6), 20, 0.0, 0, 10);
+}
+
+.border {
+    -fx-border-color: #1db954;
+    -fx-cursor: hand;
+}
+
+.white-text {
+    -fx-text-fill: #ffffff;
+}
+
+.progress-bar {
+    -fx-background-colour: #197a3b;
+}
+
+.progress-bar .bar {
+    -fx-background-color: #1db954;
+    -fx-background-insets: 0, 1, 2;
+    -fx-padding: 10;
+}
+
+.list-view {
+    -fx-border-color: #000000;
+}
+
+.list-view .list-cell:odd {
+    -fx-background-color: #202020;
+}
+
+.list-view .list-cell:even {
+    -fx-background-color: #292929;
+}
+
+.list-view .list-cell:selected:odd,
+.list-view .list-cell:selected:even {
+    -fx-background-color: rgb(60, 122, 60);
 }

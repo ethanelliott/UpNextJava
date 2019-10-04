@@ -1,7 +1,10 @@
 package ca.ethanelliott.upnext.client.controllers;
 
 import ca.ethanelliott.upnext.client.UpNext;
+import ca.ethanelliott.upnext.server.socket.Message;
+import ca.ethanelliott.upnext.server.upnext.Party;
 import com.google.gson.Gson;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -142,9 +145,13 @@ public class spotifyAuthController implements Initializable {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            // this needs to connect to the server and then create the new party
-            // HERE
             UpNext main = UpNext.getInstance();
+            main.on("party-created", (Message message) -> {
+                Party party = (Party) message.getData().getData();
+                UpNext.getInstance().setPartyID(party.getUuid());
+                goToMain(event);
+                return null;
+            });
             if (main.interSceneObject instanceof HashMap) {
                 try {
                     String name = (String) ((HashMap) main.interSceneObject).get("name");
@@ -159,22 +166,27 @@ public class spotifyAuthController implements Initializable {
                 }
             }
         }
-        Parent view = null;
-        try {
-            view = FXMLLoader.load(Objects.requireNonNull
-                    (getClass()
-                            .getClassLoader()
-                            .getResource("ca/ethanelliott/upnext/client/interfaces/main.fxml")
-                    )
-            );
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        assert view != null;
-        Scene scene = new Scene(view);
-        scene.getStylesheets().add(String.valueOf(this.getClass().getClassLoader().getResource("ca/ethanelliott/upnext/client/interfaces/style/style.css")));
-        Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        window.setScene(scene);
-        window.show();
+    }
+
+    private void goToMain(ActionEvent event) {
+        Platform.runLater(() -> {
+            Parent view = null;
+            try {
+                view = FXMLLoader.load(Objects.requireNonNull
+                        (getClass()
+                                .getClassLoader()
+                                .getResource("ca/ethanelliott/upnext/client/interfaces/main.fxml")
+                        )
+                );
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            assert view != null;
+            Scene scene = new Scene(view);
+            scene.getStylesheets().add(String.valueOf(this.getClass().getClassLoader().getResource("ca/ethanelliott/upnext/client/interfaces/style/style.css")));
+            Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            window.setScene(scene);
+            window.show();
+        });
     }
 }

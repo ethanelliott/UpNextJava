@@ -1,11 +1,104 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
-<HBox styleClass="container" alignment="CENTER" prefHeight="800" prefWidth="1000"
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.Button?>
+<HBox styleClass="container" alignment="CENTER" prefHeight="800" HBox.hgrow="ALWAYS" prefWidth="1000"
       fx:controller="ca.ethanelliott.upnext.client.controllers.mainController"
       xmlns:fx="http://javafx.com/fxml/1">
-    <VBox alignment="CENTER" spacing="40">
+    <HBox styleClass="mainBackground" HBox.hgrow="ALWAYS" alignment="CENTER">
+        <VBox HBox.hgrow="ALWAYS">
+            <HBox styleClass="header-container" prefHeight="64" HBox.hgrow="ALWAYS">
+                <HBox spacing="12" alignment="CENTER_LEFT" prefHeight="64">
+                    <ImageView fitHeight="24" preserveRatio="true">
+                        <Image url="@../../resources/music_note.png"/>
+                    </ImageView>
+                    <HBox alignment="CENTER_LEFT" prefHeight="64">
+                        <Label text="UP">
+                            <style>
+                                -fx-font-family: Arial;
+                                -fx-font-weight: bold;
+                                -fx-font-size: 24;
+                            </style>
+                        </Label>
+                        <Label text="NEXT">
+                            <style>
+                                -fx-font-family: Arial;
+                                -fx-font-weight: 100;
+                                -fx-font-style: italic;
+                                -fx-font-size: 24;
+                            </style>
+                        </Label>
+                    </HBox>
+                </HBox>
+                <HBox alignment="CENTER_RIGHT" prefHeight="64" HBox.hgrow="ALWAYS">
+                    <Label fx:id="partyCode" text="####">
+                        <style>
+                            -fx-font-family: monospace;
+                            -fx-font-size: 24;
+                        </style>
+                    </Label>
+                </HBox>
+            </HBox>
+            <VBox alignment="CENTER" styleClass="main-container" VBox.vgrow="ALWAYS" spacing="32">
+                <HBox alignment="CENTER" styleClass="albumArtworkContainer">
+                    <ImageView fx:id="albumArtwork" fitHeight="400" preserveRatio="true">
+                        <Image
+                               url="https://discussions.apple.com/content/attachment/881765040"/>
+                    </ImageView>
+                </HBox>
+                <HBox alignment="CENTER_LEFT" maxWidth="400">
+                    <VBox spacing="10">
+                        <Label fx:id="songName" text="">
+                            <style>
+                                -fx-font-family: Arial;
+                                -fx-font-size: 24;
+                            </style>
+                        </Label>
+                        <Label fx:id="songArtist" text="">
+                            <style>
+                                -fx-font-family: Arial;
+                                -fx-font-size: 16;
+                            </style>
+                        </Label>
+                    </VBox>
+                </HBox>
+            </VBox>
+            <HBox styleClass="footer-container" alignment="CENTER" HBox.hgrow="ALWAYS" prefHeight="48">
+                <HBox HBox.hgrow="ALWAYS" alignment="CENTER">
+                    <Button onAction="#togglePlayState" styleClass="button-flat">
+                        <graphic>
+                            <ImageView fx:id="trackPlayState" fitHeight="24" preserveRatio="true">
+                                <Image url="@../../resources/play.png"/>
+                            </ImageView>
+                        </graphic>
+                    </Button>
+                    <Button onAction="#skipSong" styleClass="button-flat">
+                        <graphic>
+                            <ImageView fitHeight="24" preserveRatio="true">
+                                <Image url="@../../resources/skip.png"/>
+                            </ImageView>
+                        </graphic>
+                    </Button>
+                </HBox>
+                <HBox HBox.hgrow="ALWAYS" alignment="CENTER">
+                    <ProgressBar fx:id="progress" prefWidth="800" progress="0.25">
 
-    </VBox>
+                    </ProgressBar>
+                </HBox>
+                <HBox HBox.hgrow="ALWAYS" alignment="CENTER">
+                    <Button styleClass="button-flat" onAction="#openQueue">
+                        <graphic>
+                            <ImageView fitHeight="24" preserveRatio="true">
+                                <Image url="@../../resources/playlist.png"/>
+                            </ImageView>
+                        </graphic>
+                    </Button>
+                </HBox>
+            </HBox>
+        </VBox>
+    </HBox>
 </HBox>

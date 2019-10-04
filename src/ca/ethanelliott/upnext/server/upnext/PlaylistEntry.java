@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class PlaylistEntry implements Serializable {
-    private int id;
+    private String id;
     private String name;
     private String artist;
     private String artwork;
@@ -15,11 +15,11 @@ public class PlaylistEntry implements Serializable {
 
     PlaylistEntry() { }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

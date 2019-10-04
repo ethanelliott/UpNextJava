@@ -28,6 +28,8 @@ public class startController implements Initializable {
     @FXML
     public TextField partyName;
     @FXML
+    public Button backButton;
+    @FXML
     private URL location;
 
     public startController() {
@@ -68,5 +70,20 @@ public class startController implements Initializable {
         } else {
             this.startButton.setDisable(true);
         }
+    }
+
+    @FXML
+    public void goBack(ActionEvent event) throws IOException {
+        Parent view = FXMLLoader.load(Objects.requireNonNull
+                (getClass()
+                        .getClassLoader()
+                        .getResource("ca/ethanelliott/upnext/client/interfaces/landing.fxml")
+                )
+        );
+        Scene scene = new Scene(view);
+        scene.getStylesheets().add(String.valueOf(this.getClass().getClassLoader().getResource("ca/ethanelliott/upnext/client/interfaces/style/style.css")));
+        Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        window.setScene(scene);
+        window.show();
     }
 }

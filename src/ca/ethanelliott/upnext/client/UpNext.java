@@ -2,11 +2,15 @@ package ca.ethanelliott.upnext.client;
 
 import ca.ethanelliott.upnext.server.socket.Message;
 import ca.ethanelliott.upnext.server.upnext.Party;
+import javafx.application.Platform;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
 
 public class UpNext implements Runnable{
     private static UpNext instance = null;
@@ -23,16 +27,29 @@ public class UpNext implements Runnable{
     private Thread consumer;
     private Thread producer;
 
+    private Map<String, Function<Message, Object>> socketEventLookup;
+
     private String address;
 
     private String partyID;
-
+    private String partyCode;
     public Object interSceneObject;
 
-    // This object will also need to know about what party it is in and its nickname
+    public Map<String, Function<Message, Object>> getSocketEventLookup() {
+        return socketEventLookup;
+    }
+
+    public String getPartyID() {
+        return partyID;
+    }
+
+    public void setPartyID(String partyID) {
+        this.partyID = partyID;
+    }
 
     private UpNext() {
         try {
+            this.socketEventLookup = new HashMap<>();
             this.server = new Socket("localhost", 8888);
             this.out = new ObjectOutputStream(server.getOutputStream());
             this.in = new ObjectInputStream(server.getInputStream());
@@ -68,6 +85,7 @@ public class UpNext implements Runnable{
                 }
             } catch (Exception e) {
                 System.out.println("UNHANDLED ERROR IN CONSUMER");
+                e.printStackTrace();
                 try {
                     this.server.close();
                 } catch (IOException ex) {
@@ -80,19 +98,11 @@ public class UpNext implements Runnable{
     }
 
     private void processEvents(Message message) {
-        switch(message.getData().getEventIdentifier()) {
-            case "party-created":
-                Party party = (Party) message.getData().getData();
-                System.out.println(party.getName() + " | " + party.getCode() + " | " + party.getUuid());
-                this.partyID = party.getUuid();
-                UpNext.getInstance().startEventLoop();
-                break;
-            case "event-loop-response":
-                this.eventLoopResponse(message);
-                break;
-            default:
-                System.out.println("Unknown event identifier :(");
-                break;
+        String eventIdentifier = message.getData().getEventIdentifier();
+        if (this.socketEventLookup.containsKey(eventIdentifier)) {
+            this.socketEventLookup.get(eventIdentifier).apply(message);
+        } else {
+            throw new IllegalStateException("Unknown event identifier: " + eventIdentifier);
         }
     }
 
@@ -106,8 +116,8 @@ public class UpNext implements Runnable{
                 // This is the producer thread
                 System.out.println("Starting EVENT LOOP");
                 try {
-                    while (true) {
-                        Thread.sleep(100);
+                    while (!Thread.interrupted()) {
+                        Thread.sleep(800);
                         try {
                             Message m = new Message(this.address, "*", "event-loop", this.partyID);
                             this.out.writeObject(m);
@@ -125,8 +135,7 @@ public class UpNext implements Runnable{
         }
     }
 
-    private void eventLoopResponse(Message message) {
-        Party party = (Party) message.getData().getData();
-
+    public void on(String eventIdentifier, Function<Message, Object> eventHandler) {
+        this.socketEventLookup.put(eventIdentifier, eventHandler);
     }
 }

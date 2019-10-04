@@ -58,7 +58,19 @@
                 </HBox>
                 <TextField styleClass="input" fx:id="userName" onKeyReleased="#checkInput" promptText="Nick Name"/>
             </VBox>
-            <Button styleClass="button-full" fx:id="joinButton" onAction="#joinParty" text="JOIN" prefWidth="600"/>
+            <HBox spacing="30">
+                <Button styleClass="button-outline" fx:id="backButton" onAction="#goBack" text="BACK" prefWidth="300"/>
+                <Button styleClass="button-full" fx:id="joinButton" onAction="#joinParty" text="JOIN" prefWidth="300"/>
+            </HBox>
+            <HBox alignment="CENTER">
+                <Label fx:id="errorText" text="">
+                    <style>
+                        -fx-font-family: Arial;
+                        -fx-font-size: 14;
+                        -fx-text-fill: #dd4040;
+                    </style>
+                </Label>
+            </HBox>
         </VBox>
     </VBox>
 </HBox>

@@ -58,7 +58,10 @@
                 </HBox>
                 <PasswordField styleClass="input" fx:id="adminPassword" onKeyReleased="#checkInput" promptText="Admin Password"/>
             </VBox>
-            <Button styleClass="button-full" fx:id="startButton" onAction="#startParty" text="CREATE" prefWidth="600"/>
+            <HBox spacing="30">
+                <Button styleClass="button-outline" fx:id="backButton" onAction="#goBack" text="BACK" prefWidth="300"/>
+                <Button styleClass="button-full" fx:id="startButton" onAction="#startParty" text="CREATE" prefWidth="300"/>
+            </HBox>
         </VBox>
     </VBox>
 </HBox>

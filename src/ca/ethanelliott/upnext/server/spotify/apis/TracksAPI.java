@@ -8,7 +8,6 @@ import java.util.Map;
 public class TracksAPI {
     public TracksAPI() {
     }
-
     public Map<String, Object> getTrack(String accessToken, String trackID) {
         return WebApiRequestBuilder
                 .make(accessToken)
@@ -17,5 +16,4 @@ public class TracksAPI {
                 .build()
                 .execute();
     }
-
 }

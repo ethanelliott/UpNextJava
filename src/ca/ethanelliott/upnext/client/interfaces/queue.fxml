@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<VBox styleClass="container" prefHeight="800" prefWidth="500" HBox.hgrow="ALWAYS"
+      fx:controller="ca.ethanelliott.upnext.client.controllers.queueController" xmlns:fx="http://javafx.com/fxml/1">
+    <VBox HBox.hgrow="ALWAYS" alignment="CENTER" VBox.vgrow="ALWAYS">
+        <HBox styleClass="header-container" prefHeight="64" HBox.hgrow="ALWAYS">
+            <HBox spacing="12" alignment="CENTER_LEFT" prefHeight="64" HBox.hgrow="ALWAYS">
+                <ImageView fitHeight="24" preserveRatio="true">
+                    <Image url="@../../resources/music_note.png"/>
+                </ImageView>
+                <HBox alignment="CENTER_LEFT" prefHeight="64">
+                    <Label text="Queue">
+                        <style>
+                            -fx-font-family: Arial;
+                            -fx-font-weight: bold;
+                            -fx-font-size: 24;
+                        </style>
+                    </Label>
+                </HBox>
+                <HBox HBox.hgrow="ALWAYS" alignment="CENTER_RIGHT" prefHeight="64">
+                    <Button onAction="#openSearch" styleClass="button-flat">
+                        <graphic>
+                            <ImageView fitHeight="24" preserveRatio="true">
+                                <Image url="@../../resources/add.png"/>
+                            </ImageView>
+                        </graphic>
+                    </Button>
+                </HBox>
+            </HBox>
+        </HBox>
+        <VBox styleClass="mainBackground" fx:id="queue" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS"/>
+    </VBox>
+</VBox>
