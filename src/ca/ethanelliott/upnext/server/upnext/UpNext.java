@@ -6,8 +6,10 @@ import ca.ethanelliott.upnext.server.socket.Message;
 import ca.ethanelliott.upnext.server.socket.Messenger;
 import ca.ethanelliott.upnext.server.spotify.SpotifyApi;
 import ca.ethanelliott.upnext.server.spotify.WebApiRequestBuilder;
+import com.google.gson.Gson;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -79,6 +81,41 @@ public class UpNext extends Thread {
             this.addSong(message);
             return null;
         });
+
+        this.on("upvote-song", (Message message) -> {
+            this.upvoteSong(message);
+            return null;
+        });
+        this.on("downvote-song", (Message message) -> {
+            this.downvoteSong(message);
+            return null;
+        });
+    }
+
+    private void downvoteSong(Message message) {
+        Map<String, Object> data = (Map<String, Object>) message.getData().getData();
+        Party party = this.partyMap.get(data.get("party-id"));
+        String songID = (String) data.get("song-id");
+        List<PlaylistEntry> playlist = party.getPlaylist();
+        for (int i = 0; i < playlist.size(); i++) {
+            double vote = playlist.get(i).getVotes();
+            if (playlist.get(i).getId().equals(songID)) {
+                party.getPlaylist().get(i).setVotes(vote-1);
+            }
+        }
+    }
+
+    private void upvoteSong(Message message) {
+        Map<String, Object> data = (Map<String, Object>) message.getData().getData();
+        Party party = this.partyMap.get(data.get("party-id"));
+        String songID = (String) data.get("song-id");
+        List<PlaylistEntry> playlist = party.getPlaylist();
+        for (int i = 0; i < playlist.size(); i++) {
+            double vote = playlist.get(i).getVotes();
+            if (playlist.get(i).getId().equals(songID)) {
+                party.getPlaylist().get(i).setVotes(vote+1);
+            }
+        }
     }
 
     private void addSong(Message message) {
@@ -93,10 +130,11 @@ public class UpNext extends Thread {
                 .build()
                 .execute();
         System.out.println(pp);
+        String name = (String) pp.get("name");
         PlaylistEntry playlistEntry = new PlaylistEntry();
         playlistEntry.setId(songID);
+        playlistEntry.setName(name);
         party.getPlaylist().add(playlistEntry);
-        System.out.println(party.getPlaylist());
     }
 
     private void search(Message message) {
@@ -130,13 +168,15 @@ public class UpNext extends Thread {
     private void giveQueue(Message message) {
         String partyID = (String) message.getData().getData();
         Party party = this.partyMap.get(partyID);
+        System.out.println(party.getPlaylist());
+        String playlist = new Gson().toJson(party.getPlaylist());
         this.messenger.postToQueueByAddress(
                 message.getSourceAddress(),
                 new Message(
                         "*",
                         message.getSourceAddress(),
                         "give-queue",
-                        party
+                        playlist
                 )
         );
     }

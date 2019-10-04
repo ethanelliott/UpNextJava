@@ -2,6 +2,7 @@ package ca.ethanelliott.upnext.server.upnext;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 public class PlaylistEntry implements Serializable {
     private String id;
@@ -10,8 +11,8 @@ public class PlaylistEntry implements Serializable {
     private String artwork;
     private double votes;
     private PlaylistAdded added;
-    private ArrayList<User> upvoters;
-    private ArrayList<User> downvoters;
+    private List<User> upvoters;
+    private List<User> downvoters;
 
     PlaylistEntry() { }
 
@@ -63,19 +64,19 @@ public class PlaylistEntry implements Serializable {
         this.added = added;
     }
 
-    public ArrayList<User> getUpvoters() {
+    public List<User> getUpvoters() {
         return upvoters;
     }
 
-    public void setUpvoters(ArrayList<User> upvoters) {
+    public void setUpvoters(List<User> upvoters) {
         this.upvoters = upvoters;
     }
 
-    public ArrayList<User> getDownvoters() {
+    public List<User> getDownvoters() {
         return downvoters;
     }
 
-    public void setDownvoters(ArrayList<User> downvoters) {
+    public void setDownvoters(List<User> downvoters) {
         this.downvoters = downvoters;
     }
 }

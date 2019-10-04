@@ -4,7 +4,9 @@ import ca.ethanelliott.upnext.client.UpNext;
 import ca.ethanelliott.upnext.server.upnext.Party;
 import ca.ethanelliott.upnext.server.upnext.PlaylistEntry;
 import com.google.gson.Gson;
+import com.sun.org.apache.xerces.internal.xs.datatypes.ObjectList;
 import javafx.application.Platform;
+import javafx.beans.binding.ObjectExpression;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -41,7 +43,7 @@ public class queueController implements Initializable {
     public queueController() {
     }
 
-    private ArrayList<PlaylistEntry> playlist = new ArrayList<>();
+    private ArrayList<Map<String, Object>> playlist = new ArrayList<>();
 
     @FXML
     public void openSearch(ActionEvent event) throws IOException {
@@ -68,7 +70,7 @@ public class queueController implements Initializable {
         Label upvoteCount = new Label();
         Button downvoteButton = new Button();
 
-        HBoxCell(String songName, int upvoteValue) {
+        HBoxCell(String songID, String songName, int upvoteValue) {
             super();
 
             label.setText(songName);
@@ -91,6 +93,31 @@ public class queueController implements Initializable {
             downvoteButton.setGraphic(downArrow);
             upvoteButton.getStyleClass().add("button-outline");
             downvoteButton.getStyleClass().add("button-outline");
+
+            upvoteButton.setOnAction((event) -> {
+                UpNext main = UpNext.getInstance();
+                Map<String, Object> data = new HashMap<>();
+                data.put("song-id", songID);
+                data.put("party-id", UpNext.getInstance().getPartyID());
+                try {
+                    main.sendMessage("upvote-song", data);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+
+            downvoteButton.setOnAction((event) -> {
+                UpNext main = UpNext.getInstance();
+                Map<String, Object> data = new HashMap<>();
+                data.put("song-id", songID);
+                data.put("party-id", UpNext.getInstance().getPartyID());
+                try {
+                    main.sendMessage("downvote-song", data);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+
             this.getChildren().addAll(label, upvoteButton, upvoteCount, downvoteButton);
         }
     }
@@ -100,18 +127,20 @@ public class queueController implements Initializable {
         UpNext main = UpNext.getInstance();
         this.startQueueLoop();
         main.on("give-queue", message -> {
-            Party party = (Party) message.getData().getData();
-            System.out.println(new Gson().toJson(party));
-//            playlist = (ArrayList<PlaylistEntry>) message.getData().getData();
-//            Platform.runLater(this::drawList);
+            String data = (String) message.getData().getData();
+            this.playlist = (ArrayList<Map<String, Object>>) new Gson().fromJson(data, List.class);
+            Platform.runLater(this::drawList);
             return null;
         });
     }
 
     private void drawList() {
         queue.getChildren().clear();
-        for (PlaylistEntry playlistEntry : this.playlist) {
-            queue.getChildren().add(new HBoxCell(playlistEntry.getName(), (int) playlistEntry.getVotes()));
+        for (Map<String, Object> playlistEntry : this.playlist) {
+            String id = (String) playlistEntry.get("id");
+            String name = (String) playlistEntry.get("name");
+            double votes = (double) playlistEntry.get("votes");
+            queue.getChildren().add(new HBoxCell(id, name, ((int) votes)));
         }
     }
 

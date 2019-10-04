@@ -54,7 +54,6 @@ public class searchController implements Initializable {
             addButton.setGraphic(upArrow);
             addButton.getStyleClass().add("button-outline");
             addButton.setOnAction(event -> {
-                System.out.println(songID);
                 UpNext main = UpNext.getInstance();
                 Map<String, Object> data = new HashMap<>();
                 data.put("song-id", songID);

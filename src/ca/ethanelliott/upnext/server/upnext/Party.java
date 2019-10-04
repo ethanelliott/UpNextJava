@@ -1,6 +1,7 @@
 package ca.ethanelliott.upnext.server.upnext;
+
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.List;
 
 public class Party implements Serializable {
     private String uuid;
@@ -14,12 +15,12 @@ public class Party implements Serializable {
     private String refreshToken;
     private double tokenExpiry;
     private String userID;
-    private ArrayList<PlaylistEntry> playlist;
+    private List<PlaylistEntry> playlist;
     private String currentTrack;
     private boolean playState;
-    private ArrayList<User> users;
-    private ArrayList<String> voteSkipList;
-    private ArrayList<String> history;
+    private List<User> users;
+    private List<String> voteSkipList;
+    private List<String> history;
 
     public String getName() {
         return name;
@@ -101,11 +102,11 @@ public class Party implements Serializable {
         this.userID = userID;
     }
 
-    public ArrayList<PlaylistEntry> getPlaylist() {
+    public List<PlaylistEntry> getPlaylist() {
         return playlist;
     }
 
-    public void setPlaylist(ArrayList<PlaylistEntry> playlist) {
+    public void setPlaylist(List<PlaylistEntry> playlist) {
         this.playlist = playlist;
     }
 
@@ -125,27 +126,27 @@ public class Party implements Serializable {
         this.playState = playState;
     }
 
-    public ArrayList<User> getUsers() {
+    public List<User> getUsers() {
         return users;
     }
 
-    public void setUsers(ArrayList<User> users) {
+    public void setUsers(List<User> users) {
         this.users = users;
     }
 
-    public ArrayList<String> getVoteSkipList() {
+    public List<String> getVoteSkipList() {
         return voteSkipList;
     }
 
-    public void setVoteSkipList(ArrayList<String> voteSkipList) {
+    public void setVoteSkipList(List<String> voteSkipList) {
         this.voteSkipList = voteSkipList;
     }
 
-    public ArrayList<String> getHistory() {
+    public List<String> getHistory() {
         return history;
     }
 
-    public void setHistory(ArrayList<String> history) {
+    public void setHistory(List<String> history) {
         this.history = history;
     }
 
