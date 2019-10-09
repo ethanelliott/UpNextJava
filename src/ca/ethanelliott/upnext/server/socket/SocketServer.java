@@ -8,7 +8,6 @@ public class SocketServer extends Thread {
     private static SocketServer instance = null;
     public static SocketServer getInstance(int portNumber) {
         if (instance == null) {
-            System.out.println("Creating new Socket Server");
             instance = new SocketServer(portNumber);
         }
         return instance;
@@ -34,7 +33,6 @@ public class SocketServer extends Thread {
             try {
                 Socket clientConnection = this.serverSocket.accept();
                 this.clientCount++;
-                System.out.println("NEW CLIENT: " + clientConnection.getRemoteSocketAddress());
                 SocketThread s = new SocketThread(clientConnection, Messenger.getInstance());
             } catch (IOException e) {
                 e.printStackTrace();

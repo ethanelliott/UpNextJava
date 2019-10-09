@@ -14,7 +14,6 @@ public class Database {
 
     public static Database getInstance() {
         if (instance == null) {
-            System.out.println("Created New Database");
             instance = new Database();
         }
         return instance;

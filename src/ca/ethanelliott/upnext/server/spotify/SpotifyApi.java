@@ -3,6 +3,14 @@ package ca.ethanelliott.upnext.server.spotify;
 import ca.ethanelliott.upnext.server.spotify.apis.*;
 
 public class SpotifyApi {
+    private static SpotifyApi instance = null;
+    public static SpotifyApi getInstance() {
+        if (instance == null) {
+            instance = new SpotifyApi();
+        }
+        return instance;
+    }
+
     public AlbumsAPI albums;
     public ArtistsAPI artists;
     public BrowseAPI browse;

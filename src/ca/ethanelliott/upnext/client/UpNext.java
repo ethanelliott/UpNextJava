@@ -57,11 +57,8 @@ public class UpNext implements Runnable{
             if (input.getData().getEventIdentifier().equals("get-address")) {
                 this.address = (String) input.getData().getData();
             }
-            System.out.println(this.address);
             this.run();
         } catch (IOException e) {
-            e.printStackTrace();
-            System.out.println("YIKES NO SERVER RUNNING!");
             System.exit(0);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
@@ -73,18 +70,15 @@ public class UpNext implements Runnable{
         // Start consumer thread
         this.consumer = new Thread(() -> {
             try {
-                System.out.println("Starting Consumer");
                 while (true) {
                     try {
                         Message input = (Message) this.in.readObject();
                         this.processEvents(input);
                     } catch (IOException | ClassNotFoundException e) {
-                        System.out.println("LOOKS LIKE THE SERVER IS NOT RUNNING");
                         System.exit(0);
                     }
                 }
             } catch (Exception e) {
-                System.out.println("UNHANDLED ERROR IN CONSUMER");
                 e.printStackTrace();
                 try {
                     this.server.close();
@@ -114,7 +108,6 @@ public class UpNext implements Runnable{
         if (this.producer == null) {
             this.producer = new Thread(() -> {
                 // This is the producer thread
-                System.out.println("Starting EVENT LOOP");
                 try {
                     while (!Thread.interrupted()) {
                         Thread.sleep(800);
@@ -126,7 +119,7 @@ public class UpNext implements Runnable{
                         }
                     }
                 } catch (Exception e) {
-                    System.out.println("UNHANDLED ERROR IN PRODUCER");
+                    e.printStackTrace();
                 }
             });
             this.producer.start();

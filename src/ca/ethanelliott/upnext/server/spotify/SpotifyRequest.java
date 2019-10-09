@@ -28,10 +28,10 @@ public class SpotifyRequest {
         this.bodyParameters = builder.bodyParameters;
     }
 
-    public HashMap<String, Object> execute() {
+    public String execute() {
         try {
             return HTTPRequest.makeRequest(this.method, this.getURI(), this.headers, this.queryParameters, this.bodyParameters);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;

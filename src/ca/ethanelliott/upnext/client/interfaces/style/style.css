@@ -126,3 +126,15 @@
 .list-view .list-cell:selected:even {
     -fx-background-color: rgb(60, 122, 60);
 }
+
+.artwork-padding {
+    -fx-padding: 10px 10px 10px 10px;
+}
+
+.info-padding {
+    -fx-padding: 0 0 0 10px;
+}
+
+.title {
+    -fx-font-size: 20;
+}

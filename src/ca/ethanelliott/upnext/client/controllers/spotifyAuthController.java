@@ -2,6 +2,7 @@ package ca.ethanelliott.upnext.client.controllers;
 
 import ca.ethanelliott.upnext.client.UpNext;
 import ca.ethanelliott.upnext.server.socket.Message;
+import ca.ethanelliott.upnext.server.spotify.types.AuthObject;
 import ca.ethanelliott.upnext.server.upnext.Party;
 import com.google.gson.Gson;
 import javafx.application.Platform;
@@ -97,7 +98,7 @@ public class spotifyAuthController implements Initializable {
     }
 
 
-    private HashMap makeRequest(URL url, String code) throws IOException {
+    private AuthObject makeRequest(URL url, String code) throws IOException {
         final String SPOTIFY_CLIENT_ID = "dd8b5386683d47cc9d955a00c1a9c3f8";
         final String SPOTIFY_CLIENT_SECRET = "8de6722b006047c7b2bbb9e1de194f24";
 
@@ -118,12 +119,10 @@ public class spotifyAuthController implements Initializable {
         CloseableHttpResponse response = httpClient.execute(httpPost);
         if (response.getEntity() != null) {
             try (BufferedReader br = new BufferedReader(new InputStreamReader(response.getEntity().getContent()))) {
-                // do something useful
                 String data = "";
                 StringBuilder res = new StringBuilder();
                 while ((data = br.readLine()) != null) { res.append(data); }
-                Gson g = new Gson();
-                return g.fromJson(res.toString(), HashMap.class);
+                return new Gson().fromJson(res.toString(), AuthObject.class);
             }
         }
         httpClient.close();
@@ -138,7 +137,7 @@ public class spotifyAuthController implements Initializable {
     public void nextWindow(ActionEvent event) {
         Map<String, String> response = this.getSpotifyAuth();
         assert response != null;
-        HashMap tokens = new HashMap<>();
+        AuthObject tokens = null;
         if (response.get("code") != null) {
             try {
                 tokens = makeRequest(new URL("https://accounts.spotify.com/api/token"), response.get("code"));

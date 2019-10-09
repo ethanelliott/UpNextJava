@@ -8,17 +8,17 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 
+import javax.lang.model.type.UnknownTypeException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class HTTPRequest {
-    public static HashMap<String, Object> makeRequest(HTTP_METHODS method, URL url, Map<String, String> headers, Map<String, String> queryParameters, Map<String, String> bodyParameters) throws IOException {
+    public static String makeRequest(HTTP_METHODS method, URL url, Map<String, String> headers, Map<String, String> queryParameters, Map<String, String> bodyParameters) throws Exception {
         CloseableHttpClient httpClient = HttpClients.createDefault();
         CloseableHttpResponse response = null;
         if (!queryParameters.isEmpty()) {
@@ -76,8 +76,7 @@ public class HTTPRequest {
                 response = httpClient.execute(delete);
                 break;
             default:
-                System.out.println("THIS SHOULD NEVER BE POSSIBLE WHAT HAVE YOU DONE");
-                break;
+                throw new Exception("Cannot find the specified method: " + method);
         }
         if (response.getEntity() != null) {
             try (BufferedReader br = new BufferedReader(new InputStreamReader(response.getEntity().getContent()))) {
@@ -87,7 +86,7 @@ public class HTTPRequest {
                     resJSON.append(rlString);
                 }
                 Gson g = new Gson();
-                return (HashMap<String, Object>) g.fromJson(resJSON.toString(), HashMap.class);
+                return resJSON.toString();
             }
         }
         httpClient.close();

@@ -11,7 +11,6 @@ import java.util.Objects;
 
 public class UpNextClient extends Application {
     public static void main(String[] args) {
-        System.out.println("UPNEXT CLIENT RUNNING");
         UpNext main = UpNext.getInstance();
         launch(args);
         System.exit(0);

@@ -33,6 +33,6 @@
                 </HBox>
             </HBox>
         </HBox>
-        <VBox styleClass="mainBackground" fx:id="queue" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS"/>
+        <VBox fx:id="queue" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS"/>
     </VBox>
 </VBox>

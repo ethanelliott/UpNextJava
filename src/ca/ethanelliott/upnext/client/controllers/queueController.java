@@ -1,9 +1,11 @@
 package ca.ethanelliott.upnext.client.controllers;
 
 import ca.ethanelliott.upnext.client.UpNext;
+import ca.ethanelliott.upnext.server.spotify.types.PlaylistObject;
 import ca.ethanelliott.upnext.server.upnext.Party;
 import ca.ethanelliott.upnext.server.upnext.PlaylistEntry;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.sun.org.apache.xerces.internal.xs.datatypes.ObjectList;
 import javafx.application.Platform;
 import javafx.beans.binding.ObjectExpression;
@@ -43,7 +45,7 @@ public class queueController implements Initializable {
     public queueController() {
     }
 
-    private ArrayList<Map<String, Object>> playlist = new ArrayList<>();
+    private ArrayList<PlaylistEntry> playlist = new ArrayList<>();
 
     @FXML
     public void openSearch(ActionEvent event) throws IOException {
@@ -65,19 +67,39 @@ public class queueController implements Initializable {
     }
 
     public static class HBoxCell extends HBox {
-        Label label = new Label();
+        HBox infoContainer = new HBox();
+        VBox titleContainer = new VBox();
+        Label song = new Label();
+        Label artist = new Label();
+        ImageView artwork = new ImageView();
         Button upvoteButton = new Button();
         Label upvoteCount = new Label();
         Button downvoteButton = new Button();
 
-        HBoxCell(String songID, String songName, int upvoteValue) {
+        HBoxCell(String songID, String songName, String artistName, String albumArtwork, int upvoteValue) {
             super();
 
-            label.setText(songName);
-            label.setMaxWidth(Double.MAX_VALUE);
-            label.getStyleClass().add("white-text");
-            HBox.setHgrow(label, Priority.ALWAYS);
+            song.setText(songName);
+            song.setMaxWidth(Double.MAX_VALUE);
+            song.getStyleClass().addAll("white-text", "title");
+            HBox.setHgrow(song, Priority.ALWAYS);
             this.setAlignment(Pos.CENTER_LEFT);
+
+            artist.setText(artistName);
+            artist.setMaxWidth(Double.MAX_VALUE);
+            artist.getStyleClass().add("white-text");
+
+
+            HBox.setHgrow(infoContainer, Priority.ALWAYS);
+            this.setAlignment(Pos.CENTER_LEFT);
+            titleContainer.getChildren().addAll(song, artist);
+            titleContainer.getStyleClass().add("info-padding");
+
+            HBox.setHgrow(titleContainer, Priority.ALWAYS);
+            artwork.setImage(new Image(albumArtwork));
+            artwork.setFitHeight(50);
+            artwork.setPreserveRatio(true);
+            infoContainer.getChildren().addAll(artwork, titleContainer);
 
             upvoteCount.setText(String.valueOf(upvoteValue));
             upvoteCount.getStyleClass().add("white-text");
@@ -91,8 +113,8 @@ public class queueController implements Initializable {
             downArrow.setPreserveRatio(true);
             upvoteButton.setGraphic(upArrow);
             downvoteButton.setGraphic(downArrow);
-            upvoteButton.getStyleClass().add("button-outline");
-            downvoteButton.getStyleClass().add("button-outline");
+            upvoteButton.getStyleClass().add("button-flat");
+            downvoteButton.getStyleClass().add("button-flat");
 
             upvoteButton.setOnAction((event) -> {
                 UpNext main = UpNext.getInstance();
@@ -118,17 +140,18 @@ public class queueController implements Initializable {
                 }
             });
 
-            this.getChildren().addAll(label, upvoteButton, upvoteCount, downvoteButton);
+            this.getChildren().addAll(infoContainer, upvoteButton, upvoteCount, downvoteButton);
+            this.getStyleClass().add("artwork-padding");
         }
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         UpNext main = UpNext.getInstance();
-        this.startQueueLoop();
+        this.getQueue();
         main.on("give-queue", message -> {
             String data = (String) message.getData().getData();
-            this.playlist = (ArrayList<Map<String, Object>>) new Gson().fromJson(data, List.class);
+            this.playlist = new Gson().fromJson(data, new TypeToken<ArrayList<PlaylistEntry>>(){}.getType());
             Platform.runLater(this::drawList);
             return null;
         });
@@ -136,34 +159,20 @@ public class queueController implements Initializable {
 
     private void drawList() {
         queue.getChildren().clear();
-        for (Map<String, Object> playlistEntry : this.playlist) {
-            String id = (String) playlistEntry.get("id");
-            String name = (String) playlistEntry.get("name");
-            double votes = (double) playlistEntry.get("votes");
-            queue.getChildren().add(new HBoxCell(id, name, ((int) votes)));
+        this.playlist.sort((a, b) -> b.getVotes() - a.getVotes());
+        for (PlaylistEntry playlistEntry : this.playlist) {
+            String id = playlistEntry.getId();
+            String name = playlistEntry.getName();
+            int votes = playlistEntry.getVotes();
+            queue.getChildren().add(new HBoxCell(id, name, playlistEntry.getArtist(), playlistEntry.getArtwork(), votes));
         }
     }
 
-    public void startQueueLoop() {
-        System.out.println("Start Queue Loop");
-        if (this.mainLoop == null) {
-            this.mainLoop = new Thread(() -> {
-                try {
-                    while (!Thread.interrupted()) {
-                        try {
-                            UpNext.getInstance().sendMessage("get-queue", UpNext.getInstance().getPartyID());
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        Thread.sleep(5000);
-                    }
-                } catch (Exception e) {
-                    System.out.println("UNHANDLED ERROR IN QueueLoop");
-                }
-            });
-            this.mainLoop.start();
-        } else {
-            System.out.println("QueueLoop ALREADY RUNNING");
+    public void getQueue() {
+        try {
+            UpNext.getInstance().sendMessage("get-queue", UpNext.getInstance().getPartyID());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

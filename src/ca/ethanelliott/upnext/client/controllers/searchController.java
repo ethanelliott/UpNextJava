@@ -1,6 +1,9 @@
 package ca.ethanelliott.upnext.client.controllers;
 
 import ca.ethanelliott.upnext.client.UpNext;
+import ca.ethanelliott.upnext.server.spotify.types.PagingObject;
+import ca.ethanelliott.upnext.server.spotify.types.SearchResultObject;
+import ca.ethanelliott.upnext.server.spotify.types.TrackObject;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -16,13 +19,12 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
+import javax.sound.midi.Track;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class searchController implements Initializable {
     @FXML
@@ -36,23 +38,40 @@ public class searchController implements Initializable {
     }
 
     public static class HBoxCell extends HBox {
-        Label label = new Label();
+        HBox infoContainer = new HBox();
+        VBox titleContainer = new VBox();
+        Label song = new Label();
+        Label artist = new Label();
+        ImageView artwork = new ImageView();
         Button addButton = new Button();
 
-        HBoxCell(String songName, String songID) {
+        HBoxCell(String songName, String artistName, String albumArtwork, String songID) {
             super();
 
-            label.setText(songName);
-            label.setMaxWidth(Double.MAX_VALUE);
-            label.getStyleClass().add("white-text");
-            HBox.setHgrow(label, Priority.ALWAYS);
+            song.setText(songName);
+            song.setMaxWidth(Double.MAX_VALUE);
+            song.getStyleClass().addAll("white-text", "title");
+
+            artist.setText(artistName);
+            artist.setMaxWidth(Double.MAX_VALUE);
+            artist.getStyleClass().add("white-text");
+
+            HBox.setHgrow(infoContainer, Priority.ALWAYS);
             this.setAlignment(Pos.CENTER_LEFT);
+            titleContainer.getChildren().addAll(song, artist);
+            titleContainer.getStyleClass().add("info-padding");
+
+            HBox.setHgrow(titleContainer, Priority.ALWAYS);
+            artwork.setImage(new Image(albumArtwork));
+            artwork.setFitHeight(50);
+            artwork.setPreserveRatio(true);
+            infoContainer.getChildren().addAll(artwork, titleContainer);
 
             ImageView upArrow = new ImageView(new Image(String.valueOf(this.getClass().getClassLoader().getResource("ca/ethanelliott/upnext/resources/add.png"))));
             upArrow.setFitHeight(16);
             upArrow.setPreserveRatio(true);
             addButton.setGraphic(upArrow);
-            addButton.getStyleClass().add("button-outline");
+            addButton.getStyleClass().add("button-flat");
             addButton.setOnAction(event -> {
                 UpNext main = UpNext.getInstance();
                 Map<String, Object> data = new HashMap<>();
@@ -64,7 +83,9 @@ public class searchController implements Initializable {
                     e.printStackTrace();
                 }
             });
-            this.getChildren().addAll(label, addButton);
+
+            this.getChildren().addAll(infoContainer, addButton);
+            this.getStyleClass().add("artwork-padding");
         }
     }
 
@@ -72,13 +93,18 @@ public class searchController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         UpNext main = UpNext.getInstance();
         main.on("search-results", (message) -> {
-            HashMap<String, Object> data = (HashMap<String, Object>) message.getData().getData();
-            HashMap<String, Object> tracks = (HashMap<String, Object>) data.get("tracks");
-            ArrayList<Map<String, Object>> items = (ArrayList<Map<String, Object>>) tracks.get("items");
+            SearchResultObject data = (SearchResultObject) message.getData().getData();
+            PagingObject<TrackObject> tracks = data.tracks;
+            ArrayList<TrackObject> items = tracks.items;
             Platform.runLater(() -> {
                 searchResults.getChildren().clear();
-                for (Map<String, Object> item : items) {
-                    searchResults.getChildren().add(new HBoxCell((String) item.get("name"), (String) item.get("id")));
+                for (TrackObject item : items) {
+                    searchResults.getChildren().add(new HBoxCell(
+                            item.name,
+                            item.artists.get(0).name,
+                            item.album.images.stream().filter(e -> e.width < 100).collect(Collectors.toList()).get(0).url,
+                            item.id
+                    ));
                 }
             });
             return null;

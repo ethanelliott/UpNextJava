@@ -1,24 +1,23 @@
 package ca.ethanelliott.upnext.server.upnext;
 
 import ca.ethanelliott.upnext.server.database.Database;
-import ca.ethanelliott.upnext.server.requests.HTTP_METHODS;
 import ca.ethanelliott.upnext.server.socket.Message;
 import ca.ethanelliott.upnext.server.socket.Messenger;
 import ca.ethanelliott.upnext.server.spotify.SpotifyApi;
-import ca.ethanelliott.upnext.server.spotify.WebApiRequestBuilder;
+import ca.ethanelliott.upnext.server.spotify.types.*;
 import com.google.gson.Gson;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class UpNext extends Thread {
     private static UpNext instance = null;
 
     public static UpNext getInstance() {
         if (instance == null) {
-            System.out.println("Created New UpNext");
             instance = new UpNext();
         }
         return instance;
@@ -34,7 +33,7 @@ public class UpNext extends Thread {
         this.eventLookup = new HashMap<>();
         this.database = Database.getInstance();
         this.messenger = Messenger.getInstance();
-        this.spotifyApi = new SpotifyApi();
+        this.spotifyApi = SpotifyApi.getInstance();
         this.start();
     }
 
@@ -48,7 +47,6 @@ public class UpNext extends Thread {
     }
 
     private void registerEvents() {
-        System.out.println("registered");
         this.on("create-party", (Message message) -> {
             this.createParty(message);
             return null;
@@ -70,7 +68,7 @@ public class UpNext extends Thread {
             return null;
         });
         this.on("get-queue", (Message message) -> {
-            this.giveQueue(message);
+            this.giveQueue((String) message.getData().getData(), message.getSourceAddress());
             return null;
         });
         this.on("search", (Message message) -> {
@@ -98,11 +96,12 @@ public class UpNext extends Thread {
         String songID = (String) data.get("song-id");
         List<PlaylistEntry> playlist = party.getPlaylist();
         for (int i = 0; i < playlist.size(); i++) {
-            double vote = playlist.get(i).getVotes();
+            int vote = playlist.get(i).getVotes();
             if (playlist.get(i).getId().equals(songID)) {
-                party.getPlaylist().get(i).setVotes(vote-1);
+                party.getPlaylist().get(i).setVotes(vote - 1);
             }
         }
+        this.giveQueue(party.getUuid(), message.getSourceAddress());
     }
 
     private void upvoteSong(Message message) {
@@ -111,70 +110,53 @@ public class UpNext extends Thread {
         String songID = (String) data.get("song-id");
         List<PlaylistEntry> playlist = party.getPlaylist();
         for (int i = 0; i < playlist.size(); i++) {
-            double vote = playlist.get(i).getVotes();
+            int vote = playlist.get(i).getVotes();
             if (playlist.get(i).getId().equals(songID)) {
-                party.getPlaylist().get(i).setVotes(vote+1);
+                party.getPlaylist().get(i).setVotes(vote + 1);
             }
         }
+        this.giveQueue(party.getUuid(), message.getSourceAddress());
     }
 
     private void addSong(Message message) {
         Map<String, Object> data = (Map<String, Object>) message.getData().getData();
         Party party = this.partyMap.get(data.get("party-id"));
         String songID = (String) data.get("song-id");
-
-        HashMap<String, Object> pp = WebApiRequestBuilder
-                .make(party.getToken())
-                .withMethod(HTTP_METHODS.GET)
-                .withPath(String.format("/v1/tracks/%s", songID))
-                .build()
-                .execute();
-        System.out.println(pp);
-        String name = (String) pp.get("name");
+        TrackObject trackObject = spotifyApi.tracks.getTrack(party.getToken(), songID);
+        String name = trackObject.name;
         PlaylistEntry playlistEntry = new PlaylistEntry();
         playlistEntry.setId(songID);
         playlistEntry.setName(name);
+        playlistEntry.setArtwork(trackObject.album.images.stream().filter(e -> e.width < 100).collect(Collectors.toList()).get(0).url);
+        playlistEntry.setArtist(trackObject.artists.stream().map(e -> e.name).collect(Collectors.joining(",")));
         party.getPlaylist().add(playlistEntry);
+        this.giveQueue(party.getUuid(), message.getSourceAddress());
     }
 
     private void search(Message message) {
         Map<String, Object> data = (Map<String, Object>) message.getData().getData();
         Party party = this.partyMap.get(data.get("party-id"));
         String searchTerm = (String) data.get("search-terms");
-        Map<String, String> qp = new HashMap<>();
-        qp.put("q", searchTerm);
-        qp.put("type", "track");
-        qp.put("market", "CA");
-        qp.put("limit", "20");
-        qp.put("offset", "0");
-        HashMap<String, Object> pp = WebApiRequestBuilder
-                .make(party.getToken())
-                .withMethod(HTTP_METHODS.GET)
-                .withPath("/v1/search")
-                .withQueryParameters(qp)
-                .build()
-                .execute();
+        SearchResultObject tracks = spotifyApi.search.searchTracks(party.getToken(), searchTerm);
         this.messenger.postToQueueByAddress(
                 message.getSourceAddress(),
                 new Message(
                         "*",
                         message.getSourceAddress(),
                         "search-results",
-                        pp
+                        tracks
                 )
         );
     }
 
-    private void giveQueue(Message message) {
-        String partyID = (String) message.getData().getData();
+    private void giveQueue(String partyID, String sourceAddress) {
         Party party = this.partyMap.get(partyID);
-        System.out.println(party.getPlaylist());
         String playlist = new Gson().toJson(party.getPlaylist());
         this.messenger.postToQueueByAddress(
-                message.getSourceAddress(),
+                sourceAddress,
                 new Message(
                         "*",
-                        message.getSourceAddress(),
+                        sourceAddress,
                         "give-queue",
                         playlist
                 )
@@ -184,12 +166,7 @@ public class UpNext extends Thread {
     private void skipSong(Message message) {
         String data = (String) message.getData().getData();
         Party party = this.partyMap.get(data);
-        HashMap<String, Object> pp = WebApiRequestBuilder
-                .make(party.getToken())
-                .withMethod(HTTP_METHODS.POST)
-                .withPath("/v1/me/player/next")
-                .build()
-                .execute();
+        spotifyApi.player.next(party.getToken());
     }
 
     private void togglePlayback(Message message) {
@@ -197,21 +174,9 @@ public class UpNext extends Thread {
         Party party = this.partyMap.get(data.get("party-id"));
         boolean isPlaying = (boolean) data.get("is-playing");
         if (isPlaying) {
-            HashMap<String, Object> pp = WebApiRequestBuilder
-                    .make(party.getToken())
-                    .withMethod(HTTP_METHODS.PUT)
-                    .withPath("/v1/me/player/pause")
-                    .build()
-                    .execute();
-            System.out.println(pp);
+            spotifyApi.player.pause(party.getToken());
         } else {
-            HashMap<String, Object> pp = WebApiRequestBuilder
-                    .make(party.getToken())
-                    .withMethod(HTTP_METHODS.PUT)
-                    .withPath("/v1/me/player/play")
-                    .build()
-                    .execute();
-            System.out.println(pp);
+            spotifyApi.player.play(party.getToken());
         }
 
     }
@@ -256,30 +221,25 @@ public class UpNext extends Thread {
     }
 
     private void createParty(Message message) {
-        System.out.println("NEW PARTY CREATED!");
         Map<String, Object> data = (Map<String, Object>) message.getData().getData();
-        Map<String, Object> userData = spotifyApi.users.getCurrentUsersProfile((String) ((Map<String, Object>) data.get("tokens")).get("access_token"));
+        AuthObject authObject = (AuthObject) data.get("tokens");
+        PrivateUserObject userData = spotifyApi.users.getCurrentUsersProfile(authObject.access_token);
         Party party = PartyBuilder.build(
                 (String) data.get("name"),
                 (String) data.get("password"),
-                (String) ((Map<String, Object>) data.get("tokens")).get("access_token"),
-                (String) ((Map<String, Object>) data.get("tokens")).get("refresh_token"),
-                (double) ((Map<String, Object>) data.get("tokens")).get("expires_in"),
-                (String) userData.get("id")
+                authObject.access_token,
+                authObject.refresh_token,
+                authObject.expires_in,
+                userData.id
         );
         this.partyMap.put(party.getUuid(), party);
-        System.out.println(spotifyApi.tracks.getTrack(party.getToken(), "12mGwph2YzDIlChtq3EdXP"));
         this.messenger.postToQueueByAddress(message.getSourceAddress(), new Message("*", message.getSourceAddress(), "party-created", party));
     }
 
     private void eventLoop(Message message) {
         Party party = this.partyMap.get((String) message.getData().getData());
-        HashMap<String, Object> playerState = WebApiRequestBuilder
-                .make(party.getToken())
-                .withMethod(HTTP_METHODS.GET)
-                .withPath("/v1/me/player")
-                .build()
-                .execute();
+
+        CurrentlyPlayingObject playerState = spotifyApi.player.getPlayingContext(party.getToken());
         HashMap<String, Object> response = new HashMap<>();
         response.put("party", party);
         response.put("player", playerState);

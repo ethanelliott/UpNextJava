@@ -31,16 +31,12 @@ public class UpNextServer extends Application {
             System.exit(0);
         }).start();
 
-        System.out.println("UPNEXT SERVER RUNNING");
-
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            System.out.println("Shutting Down...");
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            System.out.println("UpNext Server Stopped");
         }));
     }
 

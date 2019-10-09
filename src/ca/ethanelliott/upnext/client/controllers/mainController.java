@@ -2,6 +2,10 @@ package ca.ethanelliott.upnext.client.controllers;
 
 import ca.ethanelliott.upnext.client.UpNext;
 import ca.ethanelliott.upnext.server.socket.Message;
+import ca.ethanelliott.upnext.server.spotify.types.ArtistObject;
+import ca.ethanelliott.upnext.server.spotify.types.CurrentlyPlayingObject;
+import ca.ethanelliott.upnext.server.spotify.types.ImageObject;
+import ca.ethanelliott.upnext.server.spotify.types.TrackObject;
 import ca.ethanelliott.upnext.server.upnext.Party;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -52,18 +56,18 @@ public class mainController implements Initializable {
         main.on("event-loop-response", (Message message) -> {
             HashMap<String, Object> data = (HashMap<String, Object>) message.getData().getData();
             Party party = (Party) data.get("party");
-            HashMap<String, Object> playerState = (HashMap<String, Object>) data.get("player");
+            CurrentlyPlayingObject playerState = (CurrentlyPlayingObject) data.get("player");
             Platform.runLater(() -> {
-                HashMap<String, Object> item = (HashMap<String, Object>)playerState.get("item");
-                HashMap<String, Object> artist = (HashMap<String, Object>) ((ArrayList<Object>) item.get("artists")).get(0);
-                HashMap<String, Object> album = (HashMap<String, Object>) ((ArrayList<Object>) ((HashMap<String, Object>) item.get("album")).get("images")).get(0);
+                TrackObject item = playerState.item;
+                ArtistObject artist = item.artists.get(0);
+                ImageObject albumArt = item.album.images.get(0);
                 partyCode.setText(party.getCode());
-                songName.setText((String) item.get("name"));
-                songArtist.setText((String) artist.get("name"));
-                albumArtwork.setImage(new Image((String) album.get("url")));
-                double track_time = ((double) playerState.get("progress_ms")) / (double)(item.get("duration_ms"));
+                songName.setText(item.name);
+                songArtist.setText(artist.name);
+                albumArtwork.setImage(new Image(albumArt.url));
+                double track_time = playerState.progress_ms / (double) item.duration_ms;
                 progress.setProgress(track_time);
-                isPlaying = (boolean) playerState.get("is_playing");
+                isPlaying = playerState.is_playing;
                 if (isPlaying) {
                     trackPlayState.setImage(new Image(String.valueOf(this.getClass().getClassLoader().getResource("ca/ethanelliott/upnext/resources/pause.png"))));
                 } else {

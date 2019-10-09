@@ -9,7 +9,6 @@ public class Messenger {
 
     public static Messenger getInstance() {
         if (instance == null) {
-            System.out.println("Created New Messenger");
             instance = new Messenger();
         }
         return instance;

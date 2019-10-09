@@ -9,7 +9,7 @@ public class PlaylistEntry implements Serializable {
     private String name;
     private String artist;
     private String artwork;
-    private double votes;
+    private int votes;
     private PlaylistAdded added;
     private List<User> upvoters;
     private List<User> downvoters;
@@ -48,11 +48,11 @@ public class PlaylistEntry implements Serializable {
         this.artwork = artwork;
     }
 
-    public double getVotes() {
+    public int getVotes() {
         return votes;
     }
 
-    public void setVotes(double votes) {
+    public void setVotes(int votes) {
         this.votes = votes;
     }
 
